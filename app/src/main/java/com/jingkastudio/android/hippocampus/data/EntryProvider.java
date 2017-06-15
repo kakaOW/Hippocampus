@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
-import com.jingkastudio.android.hippocampus.data.EntryContract.DailyEntry;
+import com.jingkastudio.android.hippocampus.data.DBStructure.DailyEntry;
 
 /**
  * {@link ContentProvider} for Hippocampus app.
@@ -20,10 +20,10 @@ public class EntryProvider extends ContentProvider{
     /** Tag for the log messages */
     public static final String LOG_TAG = EntryProvider.class.getSimpleName();
 
-    /** URI matcher code for the content URI for the entries table */
+    /** URI matcher code for the content URI for the daily_entry table */
     private static final int ENTRIES = 100;
 
-    /** URI matcher code for the content URI for a single entry in the entries table */
+    /** URI matcher code for the content URI for a single entry in the daily_entry table */
     private static final int ENTRY_ID = 101;
 
     /**
@@ -39,26 +39,26 @@ public class EntryProvider extends ContentProvider{
         // should recognize. All paths added to the UriMatcher have a corresponding code to return
         // when a match is found.
 
-        // The content URI of the form "com.jingkastudio.android.hippocampus/entries" will map to the
+        // The content URI of the form "com.jingkastudio.android.hippocampus/daily_entry" will map to the
         // integer code {@link #ENTRIES}. This URI is used to provide access to MULTIPLE rows
-        // of the entries table.
-        sUriMatcher.addURI(EntryContract.CONTENT_AUTHORITY, EntryContract.PATH_ENTRY, ENTRIES);
+        // of the daily_entry table.
+        sUriMatcher.addURI(DBStructure.CONTENT_AUTHORITY, DailyEntry.PATH_ENTRY, ENTRIES);
 
-        // The content URI of the form "content://com.jingkastudio.android.hippocampus/entries/#" will map to the
+        // The content URI of the form "content://com.jingkastudio.android.hippocampus/daily_entry/#" will map to the
         // integer code {@link #ENTRY_ID}. This URI is used to provide access to ONE single row
-        // of the entries table.
+        // of the daily_entry table.
         //
         // In this case, the "#" wildcard is used where "#" can be substituted for an integer.
-        // For example, "content://com.jingkastudio.android.hippocampus/entries/3" matches, but
-        // "content://com.jingkastudio.android.hippocampus/entries" (without a number at the end) doesn't match.
-        sUriMatcher.addURI(EntryContract.CONTENT_AUTHORITY, EntryContract.PATH_ENTRY + "/#", ENTRY_ID);
+        // For example, "content://com.jingkastudio.android.hippocampus/daily_entry/3" matches, but
+        // "content://com.jingkastudio.android.hippocampus/daily_entry" (without a number at the end) doesn't match.
+        sUriMatcher.addURI(DBStructure.CONTENT_AUTHORITY, DailyEntry.PATH_ENTRY + "/#", ENTRY_ID);
     }
 
-    private EntryDbHelper mEntryDbHelper;
+    private DbHelper mDbHelper;
 
     @Override
     public boolean onCreate() {
-        mEntryDbHelper = new EntryDbHelper(getContext());
+        mDbHelper = new DbHelper(getContext());
         return true;
     }
 
@@ -66,7 +66,7 @@ public class EntryProvider extends ContentProvider{
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
                         String sortOrder) {
         // Get readable database
-        SQLiteDatabase database = mEntryDbHelper.getReadableDatabase();
+        SQLiteDatabase database = mDbHelper.getReadableDatabase();
 
         // This cursor will hold the result of the query
         Cursor cursor;
@@ -75,15 +75,15 @@ public class EntryProvider extends ContentProvider{
         int match = sUriMatcher.match(uri);
         switch (match) {
             case ENTRIES:
-                // For the ENTRIES code, query the entries table directly with the given
+                // For the ENTRIES code, query the daily_entry table directly with the given
                 // projection, selection, selection arguments, and sort order. The cursor
-                // could contain multiple rows of the entries table.
+                // could contain multiple rows of the daily_entry table.
                 cursor = database.query(DailyEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
             case ENTRY_ID:
                 // For the ENTRY_ID code, extract out the ID from the URI.
-                // For an example URI such as "content://com.example.android.entries/entries/3",
+                // For an example URI such as "content://com.example.android.daily_entry/daily_entry/3",
                 // the selection will be "_id=?" and the selection argument will be a
                 // String array containing the actual ID of 3 in this case.
                 //
@@ -93,7 +93,7 @@ public class EntryProvider extends ContentProvider{
                 selection = DailyEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
-                // This will perform a query on the entries table where the _id equals 3 to return a
+                // This will perform a query on the daily_entry table where the _id equals 3 to return a
                 // Cursor containing that row of the table.
                 cursor = database.query(DailyEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
@@ -133,7 +133,7 @@ public class EntryProvider extends ContentProvider{
         }
 
         // Get writeable database
-        SQLiteDatabase database = mEntryDbHelper.getWritableDatabase();
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Insert the new entry with the given values
         long id = database.insert(DailyEntry.TABLE_NAME, null, values);
@@ -170,8 +170,8 @@ public class EntryProvider extends ContentProvider{
     }
 
     /**
-     * Update entries in the database with the given content values. Apply the changes to the rows
-     * specified in the selection and selection arguments (which could be 0 or 1 or more entries).
+     * Update daily_entry in the database with the given content values. Apply the changes to the rows
+     * specified in the selection and selection arguments (which could be 0 or 1 or more daily_entry).
      * Return the number of rows that were successfully updated.
      */
     private int updateEntry(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
@@ -190,7 +190,7 @@ public class EntryProvider extends ContentProvider{
         }
 
         // Otherwise, get writeable database to update the data
-        SQLiteDatabase database = mEntryDbHelper.getWritableDatabase();
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Perform the update on the database and get the number of rows affected
         int rowsUpdated = database.update(DailyEntry.TABLE_NAME, values, selection, selectionArgs);
@@ -208,7 +208,7 @@ public class EntryProvider extends ContentProvider{
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         // Get writeable database
-        SQLiteDatabase database = mEntryDbHelper.getWritableDatabase();
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Track the number of rows that were deleted
         int rowsDeleted;

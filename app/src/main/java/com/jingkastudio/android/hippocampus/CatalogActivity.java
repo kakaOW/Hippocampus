@@ -32,7 +32,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.jingkastudio.android.hippocampus.data.EntryContract.DailyEntry;
+import com.jingkastudio.android.hippocampus.data.DBStructure.DailyEntry;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;

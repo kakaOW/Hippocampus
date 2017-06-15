@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-import com.jingkastudio.android.hippocampus.data.EntryContract.DailyEntry;
+import com.jingkastudio.android.hippocampus.data.DBStructure.DailyEntry;
 
 /**
  * {@link EntryCursorAdapter} is an adapter for a list or grid view

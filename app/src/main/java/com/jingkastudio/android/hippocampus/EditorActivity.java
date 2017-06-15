@@ -35,7 +35,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.jingkastudio.android.hippocampus.data.EntryContract.DailyEntry;
+import com.jingkastudio.android.hippocampus.data.DBStructure.DailyEntry;
 
 /**
  * Allows user to create a new entry or edit an existing one.
