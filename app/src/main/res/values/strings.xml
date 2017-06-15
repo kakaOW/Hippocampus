@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <!-- Name for the application [CHAR LIMIT=12] -->
+    <string name="app_name">Hippocampus</string>
+
+    <!-- Label for overflow menu option that inserts fake entry data into the app [CHAR LIMIT=20] -->
+    <string name="action_insert_dummy_data">Insert Dummy Data</string>
+
+    <!-- Label for overflow menu option that deletes all entry data in the app [CHAR LIMIT=20] -->
+    <string name="action_delete_all_entries">Delete All Entries</string>
+
+    <!-- Title for the activity to add a new entry [CHAR LIMIT=20] -->
+    <string name="editor_activity_title">Entries List</string>
+
+    <!-- Label for editor menu option to save entry and leave editor [CHAR LIMIT=20] -->
+    <string name="action_save">Save</string>
+
+    <!-- Label for editor overflow menu option that deletes the current entry [CHAR LIMIT=20] -->
+    <string name="action_delete">Delete</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_entry_title">Title</string>
+
+    <!-- Toast message in editor when insert entry failed [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_entry_failed">Error with saving entry</string>
+
+    <!-- Toast message in editor when insert entry successful [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_entry_successful">Entry saved</string>
+
+    <!-- Toast message in editor when current entry was successfully updated [CHAR LIMIT=NONE] -->
+    <string name="editor_update_entry_successful">Entry updated</string>
+
+    <!-- Toast message in editor when current entry has failed to be updated [CHAR LIMIT=NONE] -->
+    <string name="editor_update_entry_failed">Error with updating entry</string>
+
+    <!-- Toast message in editor when current entry was successfully deleted [CHAR LIMIT=NONE] -->
+    <string name="editor_delete_entry_successful">Entry deleted</string>
+
+    <!-- Toast message in editor when current entry has failed to be deleted [CHAR LIMIT=NONE] -->
+    <string name="editor_delete_entry_failed">Error with deleting entry</string>
+
+    <!-- Dialog message to ask the user to confirm deleting the current entry [CHAR LIMIT=NONE] -->
+    <string name="delete_dialog_msg">Delete this entry?</string>
+
+    <!-- Dialog button text for the option to confirm deleting the current entry [CHAR LIMIT=20] -->
+    <string name="delete">Delete</string>
+
+    <!-- Dialog button text for the option to cancel deletion of the current entry [CHAR LIMIT=20] -->
+    <string name="cancel">Cancel</string>
+
+    <!-- Dialog message when user is leaving editor but hasn't saved changes [CHAR LIMIT=NONE] -->
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+
+    <!-- Dialog button text for the option to discard a user's changes [CHAR LIMIT=20] -->
+    <string name="discard">Discard</string>
+
+    <!-- Dialog button text for the option to keep editing the current entry [CHAR LIMIT=20] -->
+    <string name="keep_editing">Keep Editing</string>
+
+</resources>
