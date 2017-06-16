@@ -29,9 +29,10 @@
         />
 
 
-    <ListView
+    <fragment
+        android:name="com.jingkastudio.android.hippocampus.EntryFragment"
         android:layout_below="@+id/week_view"
-        android:id="@+id/list"
+        android:id="@+id/fragment1"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

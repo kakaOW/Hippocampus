@@ -15,13 +15,8 @@
  */
 package com.jingkastudio.android.hippocampus;
 
-import android.app.LoaderManager;
-import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -29,8 +24,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.jingkastudio.android.hippocampus.data.DBStructure.DailyEntry;
 
@@ -47,15 +40,7 @@ import noman.weekcalendar.listener.OnDateClickListener;
 /**
  * Displays list of hippocampus that were entered and stored in the app.
  */
-public class CatalogActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor> {
-
-    /** Identifier for the entry data loader */
-    private static final int ENTRY_LOADER = 0;
-
-    /** Adapter for the ListView */
-    EntryCursorAdapter mEntryCursorAdapter;
-
+public class CatalogActivity extends AppCompatActivity {
 
     private WeekCalendar weekCalendar;
     private String date;
@@ -79,35 +64,7 @@ public class CatalogActivity extends AppCompatActivity implements
             }
         });
 
-        // Find the ListView which will be populated with the entry data
-        ListView entryListView = (ListView) findViewById(R.id.list);
 
-        // Setup an Adapter to create a list of item for each row of entry data in the Cursor
-        mEntryCursorAdapter = new EntryCursorAdapter(this, null);
-        entryListView.setAdapter(mEntryCursorAdapter);
-
-        // Setup the item click listener
-        entryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                // Create new intent to go to {@link EditorActivity}
-                Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
-
-                // Form the content URI that represents the specific pet that was clicked on,
-                // by appending the "id" (passed as input to this method) onto the
-                // {@link EntryEntry#CONTENT_URI}.
-                Uri currentEntryUri = ContentUris.withAppendedId(DailyEntry.CONTENT_URI, id);
-
-                // Set the URI on the data field of the intent
-                intent.setData(currentEntryUri);
-
-                // Launch the {@link EditorActivity} to display the data for the current pet.
-                startActivity(intent);
-            }
-        });
-
-        // Kick off the loader
-        getLoaderManager().initLoader(ENTRY_LOADER, null, this);
 
     }
 
@@ -163,33 +120,5 @@ public class CatalogActivity extends AppCompatActivity implements
     }
 
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        // Define a projection that specifies the columns from the table we care about.
-        String[] projection = {
-                DailyEntry._ID,
-                DailyEntry.COLUMN_TITLE,
-                DailyEntry.COLUMN_CONTENT,
-                DailyEntry.COLUMN_TAG };
 
-        // This loader will execute the ContentProvider's query method on a background thread
-        return new CursorLoader(this,
-                DailyEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        // Update {@link EntryCursorAdapter} with this new cursor containing updated entry data
-        mEntryCursorAdapter.swapCursor(data);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        // Callback called when the data needs to be deleted
-        mEntryCursorAdapter.swapCursor(null);
-    }
 }
