@@ -78,11 +78,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         Intent intent = getIntent();
         mCurrentEntryUri = intent.getData();
 
-        // If the intent DOES NOT contain a entry content URI, create a new entry
+        // If the intent DOES NOT contain an entry content URI, create a new entry
         if (mCurrentEntryUri == null) {
 
         } else {
-            // Initialize a loader to rad the entry data from the database
+            // Initialize a loader to read the entry data from the database
             getLoaderManager().initLoader(EXISTING_ENTRY_LOADER, null, this);
         }
 
@@ -115,7 +115,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Create a ContentValues object where column names are the keys
         ContentValues values = new ContentValues();
         values.put(DailyEntry.COLUMN_TITLE, titleString);
-        values.put(DailyEntry.COLUMN_BODY, bodyString);
+        values.put(DailyEntry.COLUMN_CONTENT, bodyString);
 
         // Determine if this is a new or existing entry
         if(mCurrentEntryUri == null) {
@@ -222,7 +222,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String[] projection = {
                 DailyEntry._ID,
                 DailyEntry.COLUMN_TITLE,
-                DailyEntry.COLUMN_BODY,
+                DailyEntry.COLUMN_CONTENT,
                 DailyEntry.COLUMN_TAG };
 
         // Execute the ContentProvider's query method on a background thread
@@ -244,7 +244,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Proceed with moving to the first row of the cursor and reading data from it
         if(cursor.moveToFirst()) {
             int titleColumnIndex = cursor.getColumnIndex(DailyEntry.COLUMN_TITLE);
-            int bodyColumnIndex = cursor.getColumnIndex(DailyEntry.COLUMN_BODY);
+            int bodyColumnIndex = cursor.getColumnIndex(DailyEntry.COLUMN_CONTENT);
             int tagColumnIndex = cursor.getColumnIndex(DailyEntry.COLUMN_TAG);
 
             // Extract out the value from the Cursor for the given column index

@@ -20,7 +20,7 @@ public class EntryProvider extends ContentProvider{
     /** Tag for the log messages */
     public static final String LOG_TAG = EntryProvider.class.getSimpleName();
 
-    /** URI matcher code for the content URI for the daily_entry table */
+    /** URI matcher code for the content URI for the date_entry table */
     private static final int ENTRIES = 100;
 
     /** URI matcher code for the content URI for a single entry in the daily_entry table */
@@ -78,6 +78,7 @@ public class EntryProvider extends ContentProvider{
                 // For the ENTRIES code, query the daily_entry table directly with the given
                 // projection, selection, selection arguments, and sort order. The cursor
                 // could contain multiple rows of the daily_entry table.
+                // TODO query from date table
                 cursor = database.query(DailyEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;

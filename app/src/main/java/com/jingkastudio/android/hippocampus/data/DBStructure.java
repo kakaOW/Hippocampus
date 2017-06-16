@@ -21,7 +21,6 @@ public class DBStructure {
      * the content provider.
      */
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
-    
 
     /**
      * Inner class that defines constant values for the daily_entry table.
@@ -42,7 +41,7 @@ public class DBStructure {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ENTRY;
         
-        /** Name of database table for pets */
+        /** Name of database table */
         public static final String TABLE_NAME = "daily_entry";
 
         /**
@@ -61,7 +60,7 @@ public class DBStructure {
          * Entry Content
          * Type: TEXT
          */
-        public static final String COLUMN_BODY = "entry_content";
+        public static final String COLUMN_CONTENT = "entry_content";
 
         /**
          * Entry Tag
@@ -79,7 +78,7 @@ public class DBStructure {
          * Entry Tag
          * Type: TEXT
          */
-        public static final String COLUMN_REF_DAY__ID = "date";
+        public static final String COLUMN_DATE_REF_DATE = "date";
 
     }
 
@@ -103,7 +102,7 @@ public class DBStructure {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ENTRY;
 
 
-        /** Name of database table for pets */
+        /** Name of database table */
         public static final String TABLE_NAME = "date_entry";
 
         /**

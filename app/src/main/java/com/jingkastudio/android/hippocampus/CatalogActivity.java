@@ -130,7 +130,8 @@ public class CatalogActivity extends AppCompatActivity implements
         // Create a ContentValues object where column names are the keys
         ContentValues values = new ContentValues();
         values.put(DailyEntry.COLUMN_TITLE, "What problem did I encounter today? How did I solve the problem?");
-        values.put(DailyEntry.COLUMN_BODY, "I want to have a horizontal view that scrolls and has for example the names of the days of the week. The user scrolls horizontally. The day selected is the one in the middle ( like a spinner selection ). You can see the below image.");
+        values.put(DailyEntry.COLUMN_CONTENT, "I want to have a horizontal view that scrolls and has for example the names of the days of the week. The user scrolls horizontally. The day selected is the one in the middle ( like a spinner selection ). You can see the below image.");
+        values.put(DailyEntry.COLUMN_DATE_REF_DATE, new Date().toString());
 
         // Insert a new row into the provider using the ContentResolver
         Uri newUri = getContentResolver().insert(DailyEntry.CONTENT_URI, values);
@@ -168,7 +169,7 @@ public class CatalogActivity extends AppCompatActivity implements
         String[] projection = {
                 DailyEntry._ID,
                 DailyEntry.COLUMN_TITLE,
-                DailyEntry.COLUMN_BODY,
+                DailyEntry.COLUMN_CONTENT,
                 DailyEntry.COLUMN_TAG };
 
         // This loader will execute the ContentProvider's query method on a background thread
