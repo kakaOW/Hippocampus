@@ -42,8 +42,9 @@ import noman.weekcalendar.listener.OnDateClickListener;
  */
 public class CatalogActivity extends AppCompatActivity {
 
-    private WeekCalendar weekCalendar;
-    private String date;
+    private WeekCalendar mWeekCalendar;
+    private String mDate;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +52,8 @@ public class CatalogActivity extends AppCompatActivity {
         setContentView(R.layout.activity_catalog);
         displayWeekCalendar();
 
-        date = new SimpleDateFormat("MMM dd").format(new Date());
-        this.setTitle(date);
+        mDate = new SimpleDateFormat("MMM dd yyyy").format(new Date());
+        this.setTitle(mDate);
 
         // Setup FAB to open EditorActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -64,23 +65,26 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
-
-
     }
+
 
     // Initiate Week Calendar Library
-    private void displayWeekCalendar() {
-        weekCalendar = (WeekCalendar) findViewById(R.id.week_view);
-        weekCalendar.setOnDateClickListener(new OnDateClickListener() {
+    public void displayWeekCalendar() {
+        mWeekCalendar = (WeekCalendar) findViewById(R.id.week_view);
+        mWeekCalendar.setOnDateClickListener(new OnDateClickListener() {
             @Override
             public void onDateClick(DateTime dateTime) {
-                DateTimeFormatter fmt = DateTimeFormat.forPattern("MMM dd");
-                date = dateTime.toString(fmt);
-                setTitle(date);
+                DateTimeFormatter fmt = DateTimeFormat.forPattern("MMM dd yyyy");
+                mDate = dateTime.toString(fmt);
+                setTitle(mDate);
                 //TODO load data or show template
+
             }
         });
+
     }
+
+
 
     // Insert dummy data for debugging purposes only
     private void insertDummy() {
@@ -88,10 +92,14 @@ public class CatalogActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
         values.put(DailyEntry.COLUMN_TITLE, "What problem did I encounter today? How did I solve the problem?");
         values.put(DailyEntry.COLUMN_CONTENT, "I want to have a horizontal view that scrolls and has for example the names of the days of the week. The user scrolls horizontally. The day selected is the one in the middle ( like a spinner selection ). You can see the below image.");
-        values.put(DailyEntry.COLUMN_DATE_REF_DATE, new Date().toString());
+        values.put(DailyEntry.COLUMN_DATE_REF_DATE, mDate);
 
         // Insert a new row into the provider using the ContentResolver
         Uri newUri = getContentResolver().insert(DailyEntry.CONTENT_URI, values);
+    }
+
+    private void deleteAllPets() {
+        int rowsDeleted = getContentResolver().delete(DailyEntry.CONTENT_URI, null, null);
     }
 
     @Override
@@ -113,7 +121,7 @@ public class CatalogActivity extends AppCompatActivity {
 
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
-                // Do nothing for now
+                deleteAllPets();
                 return true;
         }
         return super.onOptionsItemSelected(item);
