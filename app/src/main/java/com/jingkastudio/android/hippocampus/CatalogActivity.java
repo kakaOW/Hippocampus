@@ -51,7 +51,9 @@ public class CatalogActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
     /** Identifier for the entry data loader */
-    private static final int ENTRY_LOADER = 0;
+    private static final int ENTRY_LOADER_0 = 0;
+
+    private static final int ENTRY_LOADER_1 = 1;
 
     /** Adapter for the ListView */
     EntryCursorAdapter mEntryCursorAdapter;
@@ -66,7 +68,7 @@ public class CatalogActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_catalog);
         displayWeekCalendar();
 
-        date = new SimpleDateFormat("MMM dd").format(new Date());
+        date = new SimpleDateFormat("yyyyMMdd").format(new Date());
         this.setTitle(date);
 
         // Setup FAB to open EditorActivity
@@ -107,7 +109,9 @@ public class CatalogActivity extends AppCompatActivity implements
         });
 
         // Kick off the loader
-        getLoaderManager().initLoader(ENTRY_LOADER, null, this);
+        getLoaderManager().initLoader(ENTRY_LOADER_1, null, this);
+
+
 
     }
 
@@ -117,10 +121,15 @@ public class CatalogActivity extends AppCompatActivity implements
         weekCalendar.setOnDateClickListener(new OnDateClickListener() {
             @Override
             public void onDateClick(DateTime dateTime) {
-                DateTimeFormatter fmt = DateTimeFormat.forPattern("MMM dd");
+                DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyyMMdd");
                 date = dateTime.toString(fmt);
                 setTitle(date);
                 //TODO load data or show template
+                if(date.equalsIgnoreCase("20170618")) {
+                    getLoaderManager().initLoader(ENTRY_LOADER_0, null, CatalogActivity.this);
+                } else {
+                    getLoaderManager().initLoader(ENTRY_LOADER_1, null, CatalogActivity.this);
+                }
             }
         });
     }
@@ -131,7 +140,7 @@ public class CatalogActivity extends AppCompatActivity implements
         ContentValues values = new ContentValues();
         values.put(DailyEntry.COLUMN_TITLE, "What problem did I encounter today? How did I solve the problem?");
         values.put(DailyEntry.COLUMN_CONTENT, "I want to have a horizontal view that scrolls and has for example the names of the days of the week. The user scrolls horizontally. The day selected is the one in the middle ( like a spinner selection ). You can see the below image.");
-        values.put(DailyEntry.COLUMN_DATE_REF_DATE, new Date().toString());
+        values.put(DailyEntry.COLUMN_DATE_REF_DATE, date);
 
         // Insert a new row into the provider using the ContentResolver
         Uri newUri = getContentResolver().insert(DailyEntry.CONTENT_URI, values);
@@ -156,12 +165,15 @@ public class CatalogActivity extends AppCompatActivity implements
 
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
-                // Do nothing for now
+                deleteAllEntries();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void deleteAllEntries() {
+        int rowsDeleted = getContentResolver().delete(DailyEntry.CONTENT_URI, null, null);
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -170,13 +182,29 @@ public class CatalogActivity extends AppCompatActivity implements
                 DailyEntry._ID,
                 DailyEntry.COLUMN_TITLE,
                 DailyEntry.COLUMN_CONTENT,
+                DailyEntry.COLUMN_DATE_REF_DATE,
                 DailyEntry.COLUMN_TAG };
+
+        String selection = null;
+
+        switch(id) {
+            case 0:
+                selection = "(" + DailyEntry.COLUMN_DATE_REF_DATE + "= '20170618')";
+                break;
+            case 1:
+                selection = "(" + DailyEntry.COLUMN_DATE_REF_DATE + "= '20170616')";
+                break;
+            default:
+                break;
+        }
+
+
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,
                 DailyEntry.CONTENT_URI,
                 projection,
-                null,
+                selection,
                 null,
                 null);
     }

@@ -57,18 +57,22 @@ public class EntryCursorAdapter extends CursorAdapter {
         // Find individual views that we want to modify in the list item layout
         TextView titleTextVIew = (TextView) view.findViewById(R.id.title);
         TextView bodyTextVIew = (TextView) view.findViewById(R.id.content);
+        TextView dateTextVIew = (TextView) view.findViewById(R.id.date);
 
         // Find the columns of entry attributes that we're interested in
         int titleColumnIndex = cursor.getColumnIndex(DailyEntry.COLUMN_TITLE);
         int bodyColumnIndex = cursor.getColumnIndex(DailyEntry.COLUMN_CONTENT);
+        int dateColumnIndex = cursor.getColumnIndex(DailyEntry.COLUMN_DATE_REF_DATE);
+
 
         // Read the entry attributes from the Cursor for the current entry
         String entryTitle = cursor.getString(titleColumnIndex);
         String entryBody = cursor.getString(bodyColumnIndex);
-
+        String entryDate = cursor.getString(dateColumnIndex);
 
         // Update the TextViews with the attributes for the current pet
         titleTextVIew.setText(entryTitle);
         bodyTextVIew.setText(entryBody);
+        dateTextVIew.setText(entryDate);
     }
 }
