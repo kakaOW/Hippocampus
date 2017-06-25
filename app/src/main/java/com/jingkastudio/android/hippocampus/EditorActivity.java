@@ -42,8 +42,6 @@ import com.jingkastudio.android.hippocampus.data.DBStructure.DailyEntry;
  */
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    /** Identifier for the entry data loader */
-    private static final int EXISTING_ENTRY_LOADER = 0;
 
     /** Content URI for the existing entry (null if it's a new entry) */
     private Uri mCurrentEntryUri;
@@ -53,6 +51,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     /** EditText field to enter the entry's breed */
     private EditText mBodyEditText;
+
+    /** Content Date and Index from @CatalogActivity */
+    private String editorDate;
+    private int editorIndex;
+
 
     /** Boolean flag that keeps track of whether the entry has been edited */
     private boolean mEntryHasChanged = false;
@@ -76,6 +79,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         // Examine the intent to determine to create a new entry or edit an existing one
         Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if(bundle != null) {
+            editorDate = bundle.getString("mDate");
+            editorIndex = bundle.getInt("currentIndex");
+        }
         mCurrentEntryUri = intent.getData();
 
         // If the intent DOES NOT contain an entry content URI, create a new entry
@@ -83,7 +91,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         } else {
             // Initialize a loader to read the entry data from the database
-            getLoaderManager().initLoader(EXISTING_ENTRY_LOADER, null, this);
+            getLoaderManager().initLoader(editorIndex, null, this);
         }
 
         // Find all relevant views that we will need to read user input from
@@ -104,6 +112,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Use trim to eliminate leading or trailing white space
         String titleString = mTitleEditText.getText().toString().trim();
         String bodyString = mBodyEditText.getText().toString().trim();
+        String dateString = editorDate;
 
         if (mCurrentEntryUri == null &&
                 TextUtils.isEmpty(titleString) && TextUtils.isEmpty(bodyString)) {
@@ -117,9 +126,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(DailyEntry.COLUMN_TITLE, titleString);
         values.put(DailyEntry.COLUMN_CONTENT, bodyString);
 
+
         // Determine if this is a new or existing entry
         if(mCurrentEntryUri == null) {
             // This is a new entry
+            values.put(DailyEntry.COLUMN_DATE_REF_DATE, dateString);
             Uri newUri = getContentResolver().insert(DailyEntry.CONTENT_URI, values);
 
             if(newUri == null) {
@@ -223,6 +234,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 DailyEntry._ID,
                 DailyEntry.COLUMN_TITLE,
                 DailyEntry.COLUMN_CONTENT,
+                DailyEntry.COLUMN_DATE_REF_DATE,
                 DailyEntry.COLUMN_TAG };
 
         // Execute the ContentProvider's query method on a background thread
@@ -245,11 +257,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         if(cursor.moveToFirst()) {
             int titleColumnIndex = cursor.getColumnIndex(DailyEntry.COLUMN_TITLE);
             int bodyColumnIndex = cursor.getColumnIndex(DailyEntry.COLUMN_CONTENT);
+            int dateColumnIndex = cursor.getColumnIndex(DailyEntry.COLUMN_DATE_REF_DATE);
             int tagColumnIndex = cursor.getColumnIndex(DailyEntry.COLUMN_TAG);
 
             // Extract out the value from the Cursor for the given column index
             String title = cursor.getString(titleColumnIndex);
             String body = cursor.getString(bodyColumnIndex);
+            String date = cursor.getString(dateColumnIndex); // TODO to be used later
             String tag = cursor.getString(tagColumnIndex); // TODO to be used later
 
             // Update the views on the screen with the values from the database
@@ -275,7 +289,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private void showUnsavedChangesDialog(
             DialogInterface.OnClickListener discardButtonClickListener) {
         // Create an AlertDialog.Builder and set the message, and click listeners
-        // for the postivie and negative buttons on the dialog.
+        // for the positive and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.unsaved_changes_dialog_msg);
         builder.setPositiveButton(R.string.discard, discardButtonClickListener);

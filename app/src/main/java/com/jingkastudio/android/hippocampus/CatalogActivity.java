@@ -18,6 +18,7 @@ package com.jingkastudio.android.hippocampus;
 import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -25,24 +26,24 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.jingkastudio.android.hippocampus.data.DBStructure;
 import com.jingkastudio.android.hippocampus.data.DBStructure.DailyEntry;
+import com.yuncun.swipeableweekview.WeekViewAdapter;
+import com.yuncun.swipeableweekview.WeekViewSwipeable;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import noman.weekcalendar.WeekCalendar;
-import noman.weekcalendar.listener.OnDateClickListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Displays list of hippocampus that were entered and stored in the app.
@@ -51,25 +52,26 @@ public class CatalogActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
     /** Identifier for the entry data loader */
-    private static final int ENTRY_LOADER_0 = 0;
+    private static final int[] ENTRY_LOADER_ARRAY = {0,1,2,3,4,5,6,7,8,9,10,11,12,13};
 
-    private static final int ENTRY_LOADER_1 = 1;
+    // Date data
+    private List<String> recordList;
+    private String mDate;
+    private int currentIndex;
+
 
     /** Adapter for the ListView */
     EntryCursorAdapter mEntryCursorAdapter;
 
 
-    private WeekCalendar weekCalendar;
-    private String date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
-        displayWeekCalendar();
 
-        date = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        this.setTitle(date);
+        mDate = new DateTime().toString(DBStructure.DATE_FORMAT);
+        this.setTitle(mDate);
 
         // Setup FAB to open EditorActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -77,6 +79,7 @@ public class CatalogActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
+                intent.putExtra("mDate", getTitle().toString());
                 startActivity(intent);
             }
         });
@@ -102,37 +105,127 @@ public class CatalogActivity extends AppCompatActivity implements
 
                 // Set the URI on the data field of the intent
                 intent.setData(currentEntryUri);
-
+                intent.putExtra("mDate", getTitle().toString());
+                intent.putExtra("currentIndex", getCurrentIndex());
+                
                 // Launch the {@link EditorActivity} to display the data for the current pet.
                 startActivity(intent);
             }
         });
 
-        // Kick off the loader
-        getLoaderManager().initLoader(ENTRY_LOADER_1, null, this);
+        //Text TODO
+        final Context context = this;
 
+        // Get Date for WeekViewAdapter
+        getRecordListforWVS();
 
+        WeekViewSwipeable wvs = (WeekViewSwipeable) findViewById(R.id.calendar_component);
 
-    }
-
-    // Initiate Week Calendar Library
-    private void displayWeekCalendar() {
-        weekCalendar = (WeekCalendar) findViewById(R.id.week_view);
-        weekCalendar.setOnDateClickListener(new OnDateClickListener() {
+        WeekViewAdapter adapter = new WeekViewAdapter(recordList) {
             @Override
-            public void onDateClick(DateTime dateTime) {
-                DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyyMMdd");
-                date = dateTime.toString(fmt);
-                setTitle(date);
-                //TODO load data or show template
-                if(date.equalsIgnoreCase("20170618")) {
-                    getLoaderManager().initLoader(ENTRY_LOADER_0, null, CatalogActivity.this);
-                } else {
-                    getLoaderManager().initLoader(ENTRY_LOADER_1, null, CatalogActivity.this);
-                }
+            public int getStrokeColor(final int index){
+                if (index == recordList.size()-1 ) { return ContextCompat.getColor(context, R.color.teal);}
+                else { return ContextCompat.getColor(context, R.color.grey_500);}
+
             }
-        });
+
+            @Override
+            public int getFillColor(final int index){
+                if (index == recordList.size()-1 ) { return ContextCompat.getColor(context, R.color.teal);}
+                else { return ContextCompat.getColor(context, R.color.grey_500);}
+
+            }
+
+            @Override
+            public TextView getTextView(TextView tv, int index){
+                tv.setText(recordList.get(index));
+                return tv;
+            }
+
+            @Override
+            public View getDayLayout(View dv, final int index){
+                dv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        GetDateList();
+                        mDate = recordList.get(index);
+                        setTitle(mDate);
+                        setCurrentIndex(index);
+
+
+
+                        // Kick off the loader
+                        getLoaderManager().initLoader(ENTRY_LOADER_ARRAY[index], null, CatalogActivity.this);
+
+                    }
+                });
+                return dv;
+            }
+
+        };
+
+        wvs.setAdapter(adapter);
+
+        // Workaround on a bug with the library that on Saturday the view will move to next week
+        wvs.leftNav.performClick();
+        // Set left and right button to null to only have 1 week view
+        wvs.setNavEnabled(false);
+
+
+        int dayLM = new DateTime().getDayOfWeek() == 7 ? 0 : new DateTime().getDayOfWeek();
+        getLoaderManager().initLoader(ENTRY_LOADER_ARRAY[dayLM], null, CatalogActivity.this);
+
     }
+
+    private void getDatesforWVS() {
+        recordList = new ArrayList<>();
+        int dayOfWeek = new DateTime().getDayOfWeek();
+        switch(dayOfWeek) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+                for (int i = dayOfWeek; i >= 0; i--) {
+                    recordList.add(new DateTime().minusDays(i).toString(DBStructure.DATE_FORMAT));
+                }
+                break;
+            case 7:
+                recordList.add(new DateTime().toString(DBStructure.DATE_FORMAT));
+                break;
+            default:
+                break;
+        }
+    }
+
+    private List<String> getRecordListforWVS() {
+        getDatesforWVS();
+        return recordList;
+    }
+
+    private void getCompleteDateofWeek() {
+        for(int i = 1; i <= 7 ; i++) {
+                recordList.add(new DateTime().plusDays(i).toString(DBStructure.DATE_FORMAT));
+        }
+
+
+    }
+
+    private List<String> GetDateList() {
+        getCompleteDateofWeek();
+        return recordList;
+    }
+
+    private void setCurrentIndex(int index) {
+        currentIndex = index;
+    }
+
+    private int getCurrentIndex() {
+        return currentIndex;
+    }
+
+
 
     // Insert dummy data for debugging purposes only
     private void insertDummy() {
@@ -140,7 +233,7 @@ public class CatalogActivity extends AppCompatActivity implements
         ContentValues values = new ContentValues();
         values.put(DailyEntry.COLUMN_TITLE, "What problem did I encounter today? How did I solve the problem?");
         values.put(DailyEntry.COLUMN_CONTENT, "I want to have a horizontal view that scrolls and has for example the names of the days of the week. The user scrolls horizontally. The day selected is the one in the middle ( like a spinner selection ). You can see the below image.");
-        values.put(DailyEntry.COLUMN_DATE_REF_DATE, date);
+        values.put(DailyEntry.COLUMN_DATE_REF_DATE, mDate);
 
         // Insert a new row into the provider using the ContentResolver
         Uri newUri = getContentResolver().insert(DailyEntry.CONTENT_URI, values);
@@ -185,18 +278,11 @@ public class CatalogActivity extends AppCompatActivity implements
                 DailyEntry.COLUMN_DATE_REF_DATE,
                 DailyEntry.COLUMN_TAG };
 
-        String selection = null;
 
-        switch(id) {
-            case 0:
-                selection = "(" + DailyEntry.COLUMN_DATE_REF_DATE + "= '20170618')";
-                break;
-            case 1:
-                selection = "(" + DailyEntry.COLUMN_DATE_REF_DATE + "= '20170616')";
-                break;
-            default:
-                break;
-        }
+        String  selection = "(" + DailyEntry.COLUMN_DATE_REF_DATE + "='"+ recordList.get(id)  +"')";
+
+
+
 
 
 

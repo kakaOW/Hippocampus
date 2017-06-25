@@ -19,20 +19,19 @@
     android:layout_height="match_parent"
     tools:context=".CatalogActivity">
 
-    <noman.weekcalendar.WeekCalendar
-        android:id="@+id/week_view"
+    <com.yuncun.swipeableweekview.WeekViewSwipeable
+        android:id="@+id/calendar_component"
         android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:background="@color/colorPrimary"
-        app:dayNameLength="threeLetters"
-        app:numOfPages="1"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-
+        app:circleDefaultFillColor="@color/grey_500"
+        app:circleDefaultStrokeColor="@color/grey_500"
+        app:circleDefaultTextColor="@color/grey_750"
         />
 
 
     <ListView
-        android:layout_below="@+id/week_view"
+        android:layout_below="@+id/calendar_component"
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -44,5 +43,5 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_pet"/>
+        android:src="@drawable/ic_add"/>
 </RelativeLayout>
