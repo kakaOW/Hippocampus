@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.jingkastudio.android.hippocampus.data.DBStructure.DailyEntry;
 import com.jingkastudio.android.hippocampus.data.DBStructure.DateEntry;
+import com.jingkastudio.android.hippocampus.data.DBStructure.SubjectTemplate;
 
 
 /**
@@ -33,10 +34,16 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_DAY_TABLE =  "CREATE TABLE " + DateEntry.TABLE_NAME + " ("
             + DateEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + DateEntry.COLUMN_DATE + " INTEGER NOT NULL, "
-            + DateEntry.COLUMN_MOOD + " INTEGER , "
+            + DateEntry.COLUMN_MOOD + " INTEGER, "
             + DateEntry.COLUMN_WEATHER + " INTEGER, "
             + DateEntry.COLUMN_LOCATION + " TEXT);";
-    
+
+    /** Create Date Table */
+    private static final String SQL_CREATE_TEMPLATE_TABLE =  "CREATE TABLE " + SubjectTemplate.TABLE_NAME + " ("
+            + SubjectTemplate._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + SubjectTemplate.COLUMN_SUBJECT + " TEXT NOT NULL, "
+            + SubjectTemplate.COLUMN_GROUP_ID + " INTEGER);";
+
     /** Constructs a new instance of {@link DbHelper}. */
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -48,6 +55,7 @@ public class DbHelper extends SQLiteOpenHelper {
         // Execute the SQL statement
         sqLiteDatabase.execSQL(SQL_CREATE_ENTRY_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_DAY_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_TEMPLATE_TABLE);
 
     }
 
@@ -58,7 +66,6 @@ public class DbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         if(newVersion > oldVersion) {
             sqLiteDatabase.beginTransaction();
-
         }
     }
 }

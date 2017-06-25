@@ -118,7 +118,7 @@ public class DBStructure {
 
         /**
          * Entry Date
-         * Type: INTEGER
+         * Type: STRING
          */
         public static final String COLUMN_DATE = "daily_date";
 
@@ -142,5 +142,51 @@ public class DBStructure {
 
 
     }
-    
+
+    /**
+     * Inner class that defines constant values for the date table.
+     */
+    public static final class SubjectTemplate implements BaseColumns {
+
+        /** Possible path (appended to base content URI for possible URI's) */
+        public static final String PATH_ENTRY = "template";
+
+        /** The content URI to access the pet data in the provider */
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_ENTRY);
+
+        /** The MIME type of the {@link #CONTENT_URI} for a list of daily entries. */
+        public static final String CONTENT_LIST_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ENTRY;
+
+        /** The MIME type of the {@link #CONTENT_URI} for a single entry. */
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ENTRY;
+
+
+        /** Name of database table */
+        public static final String TABLE_NAME = "subject_template";
+
+        /**
+         * Unique ID number
+         * Type: INTEGER
+         */
+        public static final String _ID = BaseColumns._ID;
+
+        /**
+         * Subject
+         * Type: STRING
+         */
+        public static final String COLUMN_SUBJECT = "template_subject";
+
+        /**
+         * Group ID
+         * Type: INTEGER
+         */
+        public static final String COLUMN_GROUP_ID = "template_group_id";
+
+
+
+
+    }
+
 }
